@@ -18,5 +18,13 @@ module.exports = [
             handler: controller.deleteTask
         },
     },
+    {
+        method: 'PUT',
+        path: '/edit-task/{id}',
+        options: {
+            pre: [Authentication],
+            handler: controller.editTask
+        },
+    },
 
 ]

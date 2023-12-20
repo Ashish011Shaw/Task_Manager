@@ -55,7 +55,45 @@ const deleteTask = async (req, h) => {
     }
 }
 
+// edit task
+const editTask = async (req, h) => {
+    try {
+        const { id: task_id } = req.params;
+
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" });
+        }
+
+        const { user_id, task_name, task_description } = req.payload;
+        if (!user_id) {
+            return h.response({ status: 404, message: "uesr_id is required" });
+        }
+        if (!task_name) {
+            return h.response({ status: 404, message: "task_name is required" });
+        }
+        if (!task_description) {
+            return h.response({ status: 404, message: "task_description is required" });
+        }
+
+        const updatedTask = await prisma.Task.update({
+            where: {
+                id: Number(task_id)
+            },
+            data: {
+                user_id: Number(user_id), task_name, task_description, admin_id: Number(adminId)
+            }
+        });
+
+        return h.response({ status: 201, message: "Task updated successfully", data: updatedTask })
+
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error editing task" })
+    }
+}
 module.exports = {
     createATaskToUserByAdmin,
-    deleteTask
+    deleteTask,
+    editTask
 }
