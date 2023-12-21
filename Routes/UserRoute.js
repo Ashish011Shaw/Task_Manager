@@ -1,5 +1,7 @@
 const controller = require("../Controller/UserController")
 const { Authentication } = require("../Middleware/Authenticate");
+const userAuth = require("../Middleware/UserAuth");
+
 
 
 module.exports = [
@@ -33,5 +35,14 @@ module.exports = [
         path: '/user-login',
         handler: controller.userLoginAfterApproval
     },
+    {
+        method: 'GET',
+        path: '/my-profile/{id}',
+        options: {
+            pre: [userAuth],
+            handler: controller.userProfile
+        },
+    },
+
 
 ]

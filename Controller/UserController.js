@@ -181,9 +181,44 @@ const userLoginAfterApproval = async (req, h) => {
     }
 }
 
+// user profile 
+const userProfile = async (req, h) => {
+    try {
+        const userId = req.myUserId
+        if (!userId) {
+            return h.response({ status: 404, message: "You are not Approved user till now" });
+        }
+
+        const { id } = req.params;
+        const userData = await prisma.User.findFirst({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                mobile: true,
+                isActive: true,
+                user_type: true,
+                admin_id: true,
+            },
+        });
+
+        return h.response({ success: true, status: 200, data: userData });
+
+
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error showing User's profile" });
+    }
+}
+
 module.exports = {
     createUser,
     updateUser,
     deleteUserById,
-    userLoginAfterApproval
+    userLoginAfterApproval,
+    userProfile
 }
