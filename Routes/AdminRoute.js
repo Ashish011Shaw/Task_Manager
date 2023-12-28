@@ -29,4 +29,12 @@ module.exports = [
             handler: controller.updateProjectStatus
         },
     },
+    {
+        method: 'GET',
+        path: '/admin-profile',
+        options: {
+            pre: [Authentication],
+            handler: controller.adminProfile
+        },
+    },
 ]

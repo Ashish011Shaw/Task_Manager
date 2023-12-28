@@ -12,7 +12,7 @@ const createUser = async (req, h) => {
         }
 
 
-        const { name, username, email, password, mobile, isActive, user_type, } = req.payload;
+        const { name, username, email, password, mobile, isActive, user_type, gender } = req.payload;
 
         if (!name) {
             return h.response({ status: 404, message: "Name is required" });
@@ -28,6 +28,9 @@ const createUser = async (req, h) => {
         }
         if (!mobile) {
             return h.response({ status: 404, message: "Mobile is required" });
+        }
+        if (!gender) {
+            return h.response({ status: 404, message: "Gender is required" });
         }
 
 
@@ -45,7 +48,7 @@ const createUser = async (req, h) => {
 
             const newUser = await prisma.User.create({
                 data: {
-                    name, username, email, password: hashPassword, mobile, isActive, user_type,
+                    name, username, email, password: hashPassword, mobile, isActive, user_type, gender,
                     admin_id: Number(adminId)
                 }
             });

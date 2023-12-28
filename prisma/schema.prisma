@@ -29,6 +29,7 @@ model User {
   mobile     String
   isActive   Boolean
   user_type  String  @default("user")
+  gender     String  @default("unknown")
   created_By Admin   @relation(fields: [admin_id], references: [id], onDelete: Cascade)
   admin_id   Int
   Task       Task[]

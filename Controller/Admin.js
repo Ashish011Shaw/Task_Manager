@@ -49,10 +49,10 @@ const adminLogin = async (req, h) => {
     try {
         const { email, password } = req.payload;
         if (!email) {
-            return h.response({ message: "Please enter your email" });
+            return h.response({ status: 404, message: "Please enter your email" });
         }
         if (!password) {
-            return h.response({ message: "Please enter your password" });
+            return h.response({ status: 404, message: "Please enter your password" });
         }
 
         const admin = await prisma.Admin.findFirst({
@@ -79,9 +79,54 @@ const adminLogin = async (req, h) => {
 
     } catch (error) {
         console.log(error);
-        return h.response({ message: "Error while login Admin" }).code(500);
+        return h.response({ status: 500, message: "Error while login Admin" }).code(500);
     }
 }
+
+//  admin profile with Validation
+const adminProfile = async (req, h) => {
+    try {
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" });
+        }
+
+        const adminProfile = await prisma.admin.findFirst({
+            where: {
+                id: Number(adminId)
+            }
+        });
+
+        return h.response({ status: 200, success: true, data: adminProfile });
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error while loading Admin profile" }).code(500);
+    }
+}
+
+// my-users with their task 
+// const myUsersWithTask = async (req, h) => {
+//     try {
+//         const adminId = req.userId;
+//         if (!adminId) {
+//             return h.response({ status: 404, message: "You are not an Admin" });
+//         }
+
+//         const users = await prisma.user.findMany({
+//             where: {
+//                 admin_id: Number(adminId)
+//             },
+
+//             include: {
+//                 Task: true
+//             }
+//         });
+//         return h.response({ status: 200, data: users })
+//     } catch (error) {
+//         console.log(error);
+//         return h.response({ message: "Error while login Admin", error }).code(500);
+//     }
+// }
 
 // my-users with their task 
 const myUsersWithTask = async (req, h) => {
@@ -93,18 +138,40 @@ const myUsersWithTask = async (req, h) => {
 
         const users = await prisma.user.findMany({
             where: {
-                admin_id: Number(adminId)
+                admin_id: 1
             },
-            include: {
-                Task: true
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                mobile: true,
+                isActive: true,
+                user_type: true,
+                gender: true,
+                admin_id: true,
+                Task: {
+                    select: {
+                        id: true,
+                        user_id: true,
+                        task_name: true,
+                        task_description: true,
+                        status: true,
+                        admin_id: true,
+                        created_at: true
+                    }
+                }
             }
         });
-        return h.response({ status: 200, data: users })
+
+
+        return h.response({ status: 200, data: users });
     } catch (error) {
         console.log(error);
-        return h.response({ message: "Error while login Admin", error }).code(500);
+        return h.response({ message: "Error while fetching users with tasks", error }).code(500);
     }
 }
+
 
 // right to change project's status of my user
 const updateProjectStatus = async (req, h) => {
@@ -121,6 +188,7 @@ const updateProjectStatus = async (req, h) => {
             where: {
                 id: Number(id),
             },
+
             data: {
                 status: status
             }
@@ -135,5 +203,6 @@ module.exports = {
     createAdmin,
     adminLogin,
     myUsersWithTask,
-    updateProjectStatus
+    updateProjectStatus,
+    adminProfile
 }
