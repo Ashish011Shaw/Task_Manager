@@ -37,4 +37,20 @@ module.exports = [
             handler: controller.adminProfile
         },
     },
+    {
+        method: 'PUT',
+        path: '/update-admin/{id}',
+        options: {
+            pre: [Authentication],
+            handler: controller.updateAdmin
+        },
+    },
+    {
+        method: 'POST',
+        path: '/admin/password-reset',
+        options: {
+            pre: [Authentication],
+            handler: controller.adminPasswordReset
+        },
+    },
 ]

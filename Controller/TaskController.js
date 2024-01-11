@@ -7,9 +7,9 @@ const createATaskToUserByAdmin = async (req, h) => {
         if (!adminId) {
             return h.response({ status: 404, message: "You are not an Admin" });
         }
-
-        const { user_id, task_name, task_description } = req.payload;
-        if (!user_id) {
+        const { id } = req.params;
+        const { task_name, task_description } = req.payload;
+        if (!id) {
             return h.response({ status: 404, message: "uesr_id is required" });
         }
         if (!task_name) {
@@ -21,7 +21,7 @@ const createATaskToUserByAdmin = async (req, h) => {
 
         const newTask = await prisma.Task.create({
             data: {
-                user_id: Number(user_id), task_name, task_description, admin_id: Number(adminId)
+                user_id: Number(id), task_name, task_description, admin_id: Number(adminId)
             }
         });
 

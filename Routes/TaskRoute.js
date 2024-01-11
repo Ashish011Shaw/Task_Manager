@@ -4,7 +4,7 @@ const { Authentication } = require("../Middleware/Authenticate");
 module.exports = [
     {
         method: 'POST',
-        path: '/create-task',
+        path: '/create-task/{id}',
         options: {
             pre: [Authentication],
             handler: controller.createATaskToUserByAdmin

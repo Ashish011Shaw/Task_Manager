@@ -15,6 +15,7 @@ model Admin {
   admin_name String
   email      String   @unique
   password   String
+  mobile     String?
   created_at DateTime @default(now())
   User       User[]
   Task       Task[]
@@ -41,7 +42,7 @@ model Task {
   user_id          Int
   task_name        String
   task_description String
-  status           String   @default("pending")
+  status           String   @default("Pending")
   created_By       Admin    @relation(fields: [admin_id], references: [id], onDelete: Cascade)
   admin_id         Int
   created_at       DateTime @default(now())

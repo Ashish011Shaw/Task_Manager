@@ -39,10 +39,51 @@ module.exports = [
         method: 'GET',
         path: '/my-profile/{id}',
         options: {
-            pre: [userAuth],
+            pre: [userAuth, Authentication],
             handler: controller.userProfile
         },
     },
+    // only for user
+    {
+        method: 'GET',
+        path: '/my-profile',
+        options: {
+            pre: [userAuth],
+            handler: controller.userSelfProfile
+        },
+    },
+    {
+        method: 'GET',
+        path: '/my-projects',
+        options: {
+            pre: [userAuth],
+            handler: controller.myProjects
+        },
+    },
+    {
+        method: 'GET',
+        path: '/my-project/{id}',
+        options: {
+            pre: [userAuth],
+            handler: controller.myProjectById
+        },
+    },
 
+    {
+        method: 'POST',
+        path: '/user/reset-password',
+        options: {
+            pre: [userAuth],
+            handler: controller.userResetPassword
+        },
+    },
+    {
+        method: 'PUT',
+        path: '/user/update-active-status/{id}',
+        options: {
+            pre: [Authentication],
+            handler: controller.updateUserIsActiveStatus
+        },
+    },
 
 ]

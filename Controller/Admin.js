@@ -6,7 +6,7 @@ const SECRET = process.env.SECRET
 // create admin 
 const createAdmin = async (req, h) => {
     try {
-        const { admin_name, email, password } = req.payload;
+        const { admin_name, email, password, mobile } = req.payload;
         if (!admin_name) {
             return h.response({ status: 404, message: "admin_name is required" });
         }
@@ -15,6 +15,9 @@ const createAdmin = async (req, h) => {
         }
         if (!password) {
             return h.response({ status: 404, message: "passsword is required" });
+        }
+        if (!mobile) {
+            return h.response({ status: 404, message: "Mobile is required" });
         }
 
         const preAdmin = await prisma.Admin.findFirst({
@@ -32,7 +35,8 @@ const createAdmin = async (req, h) => {
                 data: {
                     admin_name,
                     email,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    mobile
                 }
             });
 
@@ -80,6 +84,44 @@ const adminLogin = async (req, h) => {
     } catch (error) {
         console.log(error);
         return h.response({ status: 500, message: "Error while login Admin" }).code(500);
+    }
+}
+
+// update admin
+const updateAdmin = async (req, h) => {
+    try {
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" });
+        }
+        const { admin_name, email, password, mobile } = req.payload;
+        if (!admin_name) {
+            return h.response({ status: 404, message: "admin_name is required" });
+        }
+        if (!email) {
+            return h.response({ status: 404, message: "email is required" });
+        }
+        if (!password) {
+            return h.response({ status: 404, message: "passsword is required" });
+        }
+        if (!mobile) {
+            return h.response({ status: 404, message: "Mobile is required" });
+        }
+        const { id } = req.params
+        const updateData = await prisma.Admin.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                admin_name,
+                email,
+                mobile
+            }
+        });
+        return h.response({ success: true, status: 200, data: updateData });
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error while updating Admin" }).code(500);
     }
 }
 
@@ -199,10 +241,43 @@ const updateProjectStatus = async (req, h) => {
         return h.response({ message: "Error while login Admin", error }).code(500);
     }
 }
+
+// admin password reset
+const adminPasswordReset = async (req, h) => {
+    try {
+        const { oldPassword, newPassword } = req.payload;
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" }).code(404);
+        }
+
+        const isPasswordValid = await bcrypt.compare(oldPassword, req.rootUser.password);
+        if (!isPasswordValid) {
+            return h.response({ status: 404, message: "Password didn't match" }).code(404);
+        } else {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const updatePassword = await prisma.Admin.update({
+                where: {
+                    email: req.rootUser.email
+                },
+                data: {
+                    password: hashedPassword
+                }
+            });
+            return h.response({ status: 200, success: true, message: "Password changed successfully!", data: updatePassword }).code(200);
+        }
+
+    } catch (error) {
+        console.log(error);
+        return h.response({ message: "Error while password reset", error }).code(500);
+    }
+}
 module.exports = {
     createAdmin,
     adminLogin,
     myUsersWithTask,
     updateProjectStatus,
-    adminProfile
+    adminProfile,
+    updateAdmin,
+    adminPasswordReset
 }
