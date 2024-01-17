@@ -171,12 +171,60 @@ const adminProfile = async (req, h) => {
 // }
 
 // my-users with their task 
+// const myUsersWithTask = async (req, h) => {
+//     try {
+//         const adminId = req.userId;
+//         if (!adminId) {
+//             return h.response({ status: 404, message: "You are not an Admin" });
+//         }
+
+//         const users = await prisma.user.findMany({
+//             where: {
+//                 admin_id: 1
+//             },
+//             select: {
+//                 id: true,
+//                 name: true,
+//                 username: true,
+//                 email: true,
+//                 mobile: true,
+//                 isActive: true,
+//                 user_type: true,
+//                 gender: true,
+//                 admin_id: true,
+//                 Task: {
+//                     select: {
+//                         id: true,
+//                         user_id: true,
+//                         task_name: true,
+//                         task_description: true,
+//                         status: true,
+//                         admin_id: true,
+//                         created_at: true
+//                     }
+//                 }
+//             }
+//         });
+
+
+//         return h.response({ status: 200, data: users });
+//     } catch (error) {
+//         console.log(error);
+//         return h.response({ message: "Error while fetching users with tasks", error }).code(500);
+//     }
+// }
+
+// my-users with their task and pagination
 const myUsersWithTask = async (req, h) => {
     try {
         const adminId = req.userId;
         if (!adminId) {
             return h.response({ status: 404, message: "You are not an Admin" });
         }
+
+        const { page = 1 } = req.query;
+        const pageSize = 5;
+        const skip = (page - 1) * pageSize;
 
         const users = await prisma.user.findMany({
             where: {
@@ -203,16 +251,18 @@ const myUsersWithTask = async (req, h) => {
                         created_at: true
                     }
                 }
-            }
+            },
+            take: pageSize,
+            skip: skip
         });
-
 
         return h.response({ status: 200, data: users });
     } catch (error) {
         console.log(error);
         return h.response({ message: "Error while fetching users with tasks", error }).code(500);
     }
-}
+};
+
 
 
 // right to change project's status of my user
@@ -272,6 +322,26 @@ const adminPasswordReset = async (req, h) => {
         return h.response({ message: "Error while password reset", error }).code(500);
     }
 }
+
+// my total Users
+const myTotalUsers = async (req, h) => {
+    try {
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" }).code(404);
+        }
+
+        const noOfUsers = await prisma.User.count({
+            where: {
+                admin_id: Number(adminId),
+            }
+        });
+        return h.response({ success: true, data: noOfUsers });
+    } catch (error) {
+        console.log(error);
+        return h.response({ message: "Error while getting user's count reset", error }).code(500);
+    }
+}
 module.exports = {
     createAdmin,
     adminLogin,
@@ -279,5 +349,6 @@ module.exports = {
     updateProjectStatus,
     adminProfile,
     updateAdmin,
-    adminPasswordReset
+    adminPasswordReset,
+    myTotalUsers
 }

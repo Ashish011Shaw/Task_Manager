@@ -26,5 +26,20 @@ module.exports = [
             handler: controller.editTask
         },
     },
-
+    {
+        method: 'GET',
+        path: '/count-projects',
+        options: {
+            pre: [Authentication],
+            handler: controller.projectCount
+        },
+    },
+    {
+        method: 'GET',
+        path: '/count-pending-projects',
+        options: {
+            pre: [Authentication],
+            handler: controller.pendindProjectCounter
+        },
+    },
 ]

@@ -53,4 +53,12 @@ module.exports = [
             handler: controller.adminPasswordReset
         },
     },
+    {
+        method: 'GET',
+        path: '/count-my-users',
+        options: {
+            pre: [Authentication],
+            handler: controller.myTotalUsers
+        },
+    },
 ]

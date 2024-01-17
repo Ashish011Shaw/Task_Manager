@@ -92,8 +92,57 @@ const editTask = async (req, h) => {
         return h.response({ status: 500, message: "Error editing task" })
     }
 }
+
+// count
+const projectCount = async (req, h) => {
+    try {
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" }).code(404);
+        }
+
+        const counter = await prisma.Task.count({
+            where: {
+                admin_id: Number(adminId),
+            }
+        });
+        return h.response({ success: true, data: counter });
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error in counting task" }).code(500);
+    }
+};
+
+
+// pending project count
+const pendindProjectCounter = async (req, h) => {
+    try {
+        const adminId = req.userId;
+        if (!adminId) {
+            return h.response({ status: 404, message: "You are not an Admin" });
+        }
+        const pendingCounter = await prisma.task.count({
+            where: {
+                AND: [
+                    {
+                        admin_id: Number(adminId),
+                    },
+                    {
+                        status: "Pending"
+                    }
+                ]
+            }
+        });
+        return h.response({ success: true, data: pendingCounter })
+    } catch (error) {
+        console.log(error);
+        return h.response({ status: 500, message: "Error in counting Pending task" }).code(500);
+    }
+}
 module.exports = {
     createATaskToUserByAdmin,
     deleteTask,
-    editTask
+    editTask,
+    projectCount,
+    pendindProjectCounter
 }
