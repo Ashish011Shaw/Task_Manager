@@ -6,6 +6,7 @@ const createATaskToUserByAdmin = async (req, h) => {
         const adminId = req.userId;
         if (!adminId) {
             return h.response({ status: 404, message: "You are not an Admin" });
+
         }
         const { id } = req.params;
         const { task_name, task_description } = req.payload;
@@ -31,7 +32,7 @@ const createATaskToUserByAdmin = async (req, h) => {
         return h.response({ message: "Error creating task" }).code(500);
     }
 }
-
+// 1
 // delete a task 
 const deleteTask = async (req, h) => {
     try {

@@ -222,9 +222,13 @@ const myUsersWithTask = async (req, h) => {
             return h.response({ status: 404, message: "You are not an Admin" });
         }
 
-        const { page = 1 } = req.query;
-        const pageSize = 5;
-        const skip = (page - 1) * pageSize;
+        // const { page = 1 } = req.query;
+        // const pageSize = 5;
+        // const skip = (page - 1) * pageSize;
+        // pegination
+        const page = req.query.page || 1
+        const ITEM_PER_PAGE = 4;
+        const skip = (page - 1) * ITEM_PER_PAGE;
 
         const users = await prisma.user.findMany({
             where: {
@@ -252,11 +256,13 @@ const myUsersWithTask = async (req, h) => {
                     }
                 }
             },
-            take: pageSize,
+            take: ITEM_PER_PAGE,
             skip: skip
         });
+        const count = await prisma.user.count();
+        const pageCount = Math.ceil(count / ITEM_PER_PAGE);
 
-        return h.response({ status: 200, data: users });
+        return h.response({ status: 200, data: users, pagination: { page, pageCount } });
     } catch (error) {
         console.log(error);
         return h.response({ message: "Error while fetching users with tasks", error }).code(500);
